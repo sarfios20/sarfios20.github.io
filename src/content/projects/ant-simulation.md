@@ -2,6 +2,7 @@
 name: ant-simulation
 description: Ant foraging simulation where the optimal route emerges with no central control, just local pheromones and evaporation.
 repo: https://github.com/sarfios20/ant-simulation
+url: https://sarfios20.github.io/ant-simulation/
 tags: ["javascript", "canvas", "simulation", "emergent order"]
 year: 2026
 featured: true
