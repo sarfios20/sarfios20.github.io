@@ -206,6 +206,29 @@ header.site .links a:hover {
   text-decoration: none;
 }
 
+/* Narrow screens: let the nav wrap into rows instead of overflowing,
+   and anchor the palette dropdown to the header so it never leaves
+   the viewport. */
+@media (max-width: 640px) {
+  header.site nav {
+    flex-wrap: wrap;
+    row-gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  header.site .links {
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  .palette-picker { position: static; }
+
+  .palette-menu {
+    top: calc(100% + var(--space-2));
+    right: var(--space-4);
+  }
+}
+
 /* ===================== Footer ===================== */
 
 footer.site {
