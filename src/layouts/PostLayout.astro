@@ -1,0 +1,48 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  date: Date;
+  updated?: Date;
+  tags: string[];
+  canonicalUrl?: string;
+}
+
+const { title, description, date, updated, tags, canonicalUrl } = Astro.props;
+const dateFmt = new Intl.DateTimeFormat('en', { dateStyle: 'long' });
+---
+
+<BaseLayout title={title} description={description}>
+  <article>
+    <h1>{title}</h1>
+    <p class="meta">
+      <time datetime={date.toISOString()}>
+        {dateFmt.format(date)}
+      </time>
+      {updated && (
+        <>
+          <span class="dot">·</span>
+          <time datetime={updated.toISOString()}>
+            Updated on {dateFmt.format(updated)}
+          </time>
+        </>
+      )}
+      {tags.length > 0 && (
+        <>
+          <span class="dot">·</span>
+          <span class="tags">
+            {tags.map((tag) => <span class="tag">{tag}</span>)}
+          </span>
+        </>
+      )}
+    </p>
+    <slot />
+    {canonicalUrl && (
+      <p class="canonical-note">
+        Originally published on <a href={canonicalUrl}>{canonicalUrl}</a>
+      </p>
+    )}
+  </article>
+</BaseLayout>

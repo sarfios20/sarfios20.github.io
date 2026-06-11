@@ -1,0 +1,246 @@
+---
+import '../styles/global.css';
+import {
+  DEFAULT_ACCENT,
+  DEFAULT_NEUTRAL,
+  colorScales,
+  ACCENT_WEIGHTS,
+  ACCENT_LIGHTNESS,
+  ACCENT_SAT_MIN,
+  ACCENT_SAT_MAX,
+  NEUTRAL_WEIGHTS,
+  NEUTRAL_LIGHTNESS,
+  NEUTRAL_SAT_MAX,
+  NEUTRAL_SAT_FACTOR,
+  NEUTRAL_TINT_DROP,
+} from '../theme/colors.js';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const siteTitle = 'David Häggström';
+const { title, description } = Astro.props;
+const fullTitle = title === siteTitle ? title : `${title} — ${siteTitle}`;
+const buildStamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
+
+// Default scales, generated at build time from the same single source the
+// runtime picker uses.
+const defaultScales = colorScales(DEFAULT_ACCENT, DEFAULT_NEUTRAL);
+const scalesCss = `:root{${Object.entries(defaultScales)
+  .map(([k, v]) => `${k}:${v}`)
+  .join(';')}}`;
+const pickerConfig = {
+  accent: { weights: ACCENT_WEIGHTS, lightness: ACCENT_LIGHTNESS, satMin: ACCENT_SAT_MIN, satMax: ACCENT_SAT_MAX },
+  neutral: { weights: NEUTRAL_WEIGHTS, lightness: NEUTRAL_LIGHTNESS, satMax: NEUTRAL_SAT_MAX, satFactor: NEUTRAL_SAT_FACTOR, tintDrop: NEUTRAL_TINT_DROP },
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style is:inline set:html={scalesCss}></style>
+    <script is:inline define:vars={{ CFG: pickerConfig }}>
+      // Runs before paint to avoid a flash of the wrong theme/colors.
+      // CFG (ladders/clamps) comes from src/theme/colors.js via define:vars,
+      // so build-time defaults and runtime picker share one recipe.
+      (() => {
+        localStorage.removeItem('palette'); // legacy key from the old preset-palette picker
+        // ALWAYS resolve and set the theme: stored preference wins, else system.
+        const stored = localStorage.getItem('theme');
+        const systemDark = matchMedia('(prefers-color-scheme: dark)');
+        document.documentElement.dataset.theme =
+          stored === 'light' || stored === 'dark' ? stored : systemDark.matches ? 'dark' : 'light';
+        // In Auto (nothing stored), follow live system changes.
+        systemDark.addEventListener('change', (e) => {
+          if (!localStorage.getItem('theme')) {
+            document.documentElement.dataset.theme = e.matches ? 'dark' : 'light';
+          }
+        });
+
+        // Pure math; the design decisions live in CFG.
+        const hexToHsl = (hex) => {
+          const n = parseInt(hex.slice(1), 16);
+          const r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+          const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min, l = (max + min) / 2;
+          const s = d ? d / (1 - Math.abs(2 * l - 1)) : 0;
+          let h = 0;
+          if (d) {
+            if (max === r) h = ((g - b) / d) % 6;
+            else if (max === g) h = (b - r) / d + 2;
+            else h = (r - g) / d + 4;
+            h *= 60;
+            if (h < 0) h += 360;
+          }
+          return [h, s * 100];
+        };
+        const hslToHex = (h, s, l) => {
+          s /= 100; l /= 100;
+          const f = (n) => {
+            const k = (n + h / 30) % 12;
+            const c = l - s * Math.min(l, 1 - l) * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+            return Math.round(c * 255).toString(16).padStart(2, '0');
+          };
+          return '#' + f(0) + f(8) + f(4);
+        };
+
+        window.applyCustomColors = (accent, tint) => {
+          const style = document.documentElement.style;
+          if (accent) {
+            const [h, s] = hexToHsl(accent);
+            const sat = Math.min(Math.max(s, CFG.accent.satMin), CFG.accent.satMax);
+            CFG.accent.weights.forEach((w, i) =>
+              style.setProperty(`--accent-${w}`, hslToHex(h, sat, CFG.accent.lightness[i]))
+            );
+          }
+          if (tint) {
+            const [h, s] = hexToHsl(tint);
+            const sat = Math.min(s, CFG.neutral.satMax);
+            const satRatio = sat / CFG.neutral.satMax;
+            CFG.neutral.weights.forEach((w, i) => {
+              const lightness = CFG.neutral.lightness[i] - CFG.neutral.tintDrop[i] * satRatio;
+              style.setProperty(`--neutral-${w}`, hslToHex(h, sat * CFG.neutral.satFactor[i], lightness));
+            });
+          }
+        };
+        window.applyCustomColors(localStorage.getItem('accent'), localStorage.getItem('tint'));
+      })();
+    </script>
+    <title>{fullTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+  </head>
+  <body>
+    <header class="site">
+      <nav>
+        <a href="/" class="brand">{siteTitle}</a>
+        <div class="links">
+          <a href="/posts/">Posts</a>
+          <a href="/projects/">Projects</a>
+          <a href="/cv/">CV</a>
+          <a href="/about/">About</a>
+          <details class="palette-picker">
+            <summary aria-label="Customize colors" title="Colors">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="13.5" cy="6.5" r=".5" /><circle cx="17.5" cy="10.5" r=".5" /><circle cx="8.5" cy="7.5" r=".5" /><circle cx="6.5" cy="12.5" r=".5" />
+                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
+              </svg>
+            </summary>
+            <div class="palette-menu">
+              <label class="picker-row">
+                <span>Primary</span>
+                <input type="color" id="pick-accent" value={DEFAULT_ACCENT} />
+              </label>
+              <label class="picker-row" title="Tints backgrounds and grays with this hue. Light/dark comes from the theme controls.">
+                <span>Tint</span>
+                <input type="color" id="pick-tint" value={DEFAULT_NEUTRAL} />
+              </label>
+              <button class="picker-reset" id="pick-reset">Reset</button>
+            </div>
+          </details>
+          <button class="theme-mode" aria-pressed="true" title="Theme follows your system. Click to set it manually.">
+            Auto
+          </button>
+          <button class="theme-toggle" aria-label="Toggle light/dark theme" title="Theme" hidden>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+          </button>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site">
+      <span class="muted">© {new Date().getFullYear()} · <span class="subtle" title="Build timestamp">build {buildStamp}</span></span>
+    </footer>
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+
+        // Theme: "Auto" follows the system; turning it off reveals the
+        // sun/moon toggle to force light/dark. data-theme always holds the
+        // RESOLVED theme; "manual" means there is a stored preference.
+        const modeBtn = document.querySelector('.theme-mode');
+        const themeToggle = document.querySelector('.theme-toggle');
+        const systemTheme = () => (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const syncThemeUI = () => {
+          const manual = localStorage.getItem('theme') !== null;
+          themeToggle.hidden = !manual;
+          modeBtn.textContent = manual ? 'Manual' : 'Auto';
+          modeBtn.classList.toggle('active', !manual);
+          modeBtn.setAttribute('aria-pressed', String(!manual));
+          modeBtn.title = manual
+            ? 'Theme is set manually. Click to follow your system.'
+            : 'Theme follows your system. Click to set it manually.';
+        };
+        syncThemeUI();
+
+        modeBtn.addEventListener('click', () => {
+          if (localStorage.getItem('theme') !== null) {
+            localStorage.removeItem('theme');
+            root.dataset.theme = systemTheme();
+          } else {
+            localStorage.setItem('theme', root.dataset.theme);
+          }
+          syncThemeUI();
+        });
+
+        themeToggle.addEventListener('click', () => {
+          const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+          root.dataset.theme = next;
+          localStorage.setItem('theme', next);
+        });
+
+        const picker = document.querySelector('.palette-picker');
+        const accentInput = document.getElementById('pick-accent');
+        const tintInput = document.getElementById('pick-tint');
+
+        const storedAccent = localStorage.getItem('accent');
+        const storedTint = localStorage.getItem('tint');
+        if (storedAccent) accentInput.value = storedAccent;
+        if (storedTint) tintInput.value = storedTint;
+
+        accentInput.addEventListener('input', () => {
+          localStorage.setItem('accent', accentInput.value);
+          applyCustomColors(accentInput.value, null);
+        });
+        tintInput.addEventListener('input', () => {
+          localStorage.setItem('tint', tintInput.value);
+          applyCustomColors(null, tintInput.value);
+        });
+
+        document.getElementById('pick-reset').addEventListener('click', () => {
+          localStorage.removeItem('accent');
+          localStorage.removeItem('tint');
+          const style = root.style;
+          Array.from(style)
+            .filter((p) => p.startsWith('--accent-') || p.startsWith('--neutral-'))
+            .forEach((p) => style.removeProperty(p));
+          accentInput.value = accentInput.defaultValue;
+          tintInput.value = tintInput.defaultValue;
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!picker.contains(e.target)) picker.removeAttribute('open');
+        });
+      })();
+    </script>
+  </body>
+</html>
