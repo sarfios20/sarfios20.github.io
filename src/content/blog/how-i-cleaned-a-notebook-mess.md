@@ -1,14 +1,14 @@
 ---
 title: "How I cleaned a 120-notebook mess"
-description: "From 120+ Jupyter notebooks and sys.path hacks to an installable package with snapshot tests, and the unexpected payoff for AI coding."
+description: "From 120+ Jupyter notebooks and `sys.path` hacks to an installable package with snapshot tests, and the unexpected payoff for AI coding."
 date: 2026-06-11
 tags: ["python", "jupyter", "data-engineering", "refactoring"]
 draft: false
 ---
 
-I was brought in to a repo built by data analysts with varying degrees of programming knowledge (I found the mismatch jarring: the same person could understand complex SQL queries on the fly and struggle with basic Python). 120+ Jupyter notebooks plus a dozen non-packaged .py files imported with sys.path hacks that broke with any change. Symptom-driven development: multiple drop_duplicates in succession, silent error coercion, datatypes cast back and forth, and no separation between input, output, cleanup and business logic.
+I was brought in to a repo built by data analysts with varying degrees of programming knowledge (I found the mismatch jarring: the same person could understand complex SQL queries on the fly and struggle with basic Python). 120+ Jupyter notebooks plus a dozen non-packaged .py files imported with `sys.path` hacks that broke with any change. Symptom-driven development: multiple `drop_duplicates` in succession, silent error coercion, datatypes cast back and forth, and no separation between input, output, cleanup and business logic.
 
-To be fair to them the underlying database didn't help: it was really ad hoc SQL tables the BI team built for specific Tableau dashboards, not made for analysts to be pulling data directly and joining with other tables, which often involved quite a tortuous route. To give you a taste: every table had a ZONA column, and it never meant the same thing twice. Sometimes it held the zone, sometimes its internal code, sometimes a brand name stored as a literal, and which one depended on the zone itself and even on the date of the row. Joining two tables often involved a CASE expression as the join key, with hardcoded lists of special zones.
+To be fair to them the underlying database didn't help: it was really ad hoc SQL tables the BI team built for specific Tableau dashboards, not made for analysts to be pulling data directly and joining with other tables, which often involved quite a tortuous route. To give you a taste: every table had a `ZONA` column, and it never meant the same thing twice. Sometimes it held the zone, sometimes its internal code, sometimes a brand name stored as a literal, and which one depended on the zone itself and even on the date of the row. Joining two tables often involved a `CASE` expression as the join key, with hardcoded lists of special zones.
 
 ## Surviving while learning
 
@@ -18,13 +18,13 @@ The scary part of every cleanup was changing an output without noticing. My answ
 
 ## Fail early and loud
 
-What those cleanups and that manual diffing kept surfacing was often the same enemy: datatypes (yay for dynamically typed languages!). It came to a head with END2END, the most ambitious pipeline in the repo, hours of processing (on an 8GB RAM laptop) feeding a Tableau dashboard. Problems usually came from upstream phases where the bad datatype wasn't a problem yet, so nothing failed catastrophically (or it got coerced into a default) and I didn't notice until much later.
+What those cleanups and that manual diffing kept surfacing was often the same enemy: datatypes (yay for dynamically typed languages!). It came to a head with `END2END`, the most ambitious pipeline in the repo, hours of processing (on an 8GB RAM laptop) feeding a Tableau dashboard. Problems usually came from upstream phases where the bad datatype wasn't a problem yet, so nothing failed catastrophically (or it got coerced into a default) and I didn't notice until much later.
 
-So I identified critical points, boundaries in the process, and checked extensively for correctness there. I went for fail early and loud. This caused quite a bit of work, as one fix could create problems in other parts of the pipeline that now gave loud errors. From then on I removed errors='coerce' and other silent error handling whenever I could, extending the guideline to the entire codebase and not just those spot checks.
+So I identified critical points, boundaries in the process, and checked extensively for correctness there. I went for fail early and loud. This caused quite a bit of work, as one fix could create problems in other parts of the pipeline that now gave loud errors. From then on I removed `errors='coerce'` and other silent error handling whenever I could, extending the guideline to the entire codebase and not just those spot checks.
 
 ## A real package
 
-Checks tell you when something breaks; the next step was removing reasons for things to break, and the sys.path hacks were at the top of that list. If I moved a notebook into a folder to organize things, every import that depended on it broke, and any fix had to work on my coworker's paths too, not just mine. At the same time I was unifying the read layer for the old and the new billing system, one place that would deal with the SQL quirks in an abstract, composable way, which meant running head-first into those hacks every day. So I made a proper installable package in src/ with proper reusable functions, and centralized database access and most input reading. My first concern was composability: you need client debt? Just call the function and left join with your dataframe. But it did something else too: it separated the read layer from the business logic. This would become very useful later on.
+Checks tell you when something breaks; the next step was removing reasons for things to break, and the `sys.path` hacks were at the top of that list. If I moved a notebook into a folder to organize things, every import that depended on it broke, and any fix had to work on my coworker's paths too, not just mine. At the same time I was unifying the read layer for the old and the new billing system, one place that would deal with the SQL quirks in an abstract, composable way, which meant running head-first into those hacks every day. So I made a proper installable package in `src/` with proper reusable functions, and centralized database access and most input reading. My first concern was composability: you need client debt? Just call the function and left join with your dataframe. But it did something else too: it separated the read layer from the business logic. This would become very useful later on.
 
 ## Testing got cheap
 
@@ -32,7 +32,7 @@ Composability was the goal; testability was the gift. With the read layer separa
 
 ## Improving tooling
 
-Along the way I was also investing in the repo's tooling. A pre-commit hook to strip notebook output from commits (anyone who has diffed a notebook knows why), and since I was already messing with the tooling, ruff as well. And a small script for git worktrees: I had used them a bit when someone wanted a 'quick' thing, not just to avoid stashing my changes but because switching context meant pulling the data from scratch, which could take 10 minutes or more. Still, the setup was annoying enough (new worktree, reinstall the venv, copy the hooks over) that I rarely bothered. So I scripted it: one command gives me a fresh worktree with the venv dependencies installed and my pre-commit hooks in place. At the time it was just a convenience but would come in handy later on.
+Along the way I was also investing in the repo's tooling. A pre-commit hook to strip notebook output from commits (anyone who has diffed a notebook knows why), and since I was already messing with the tooling, `ruff` as well. And a small script for git worktrees: I had used them a bit when someone wanted a 'quick' thing, not just to avoid stashing my changes but because switching context meant pulling the data from scratch, which could take 10 minutes or more. Still, the setup was annoying enough (new worktree, reinstall the venv, copy the hooks over) that I rarely bothered. So I scripted it: one command gives me a fresh worktree with the venv dependencies installed and my pre-commit hooks in place. At the time it was just a convenience but would come in handy later on.
 
 ## The unexpected payoff: AI coding
 
