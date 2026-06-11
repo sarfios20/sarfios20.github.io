@@ -108,6 +108,16 @@
   --shadow:    0 5px 15px rgba(0, 0, 0, 0.4);
 }
 
+/* Desktop: slightly larger type (everything is rem-based, so spacing
+   scales in proportion) and a wider reading column. Line length stays
+   in the ~65-70ch comfort range. */
+@media (min-width: 1024px) {
+  :root {
+    font-size: 17px;
+    --measure: 42rem;
+  }
+}
+
 /* ===================== Reset ===================== */
 
 *,
