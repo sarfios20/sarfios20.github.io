@@ -5,6 +5,6 @@ import mdx from '@astrojs/mdx';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://sarfios20.github.io',
+  site: 'https://davidhaggstrom.dev',
   integrations: [mdx()],
 });
