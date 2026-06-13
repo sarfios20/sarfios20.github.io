@@ -14,7 +14,14 @@ const { title, description, date, updated, tags, canonicalUrl } = Astro.props;
 const dateFmt = new Intl.DateTimeFormat('en', { dateStyle: 'long' });
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  publishedTime={date}
+  modifiedTime={updated}
+  tags={tags}
+>
   <article>
     <h1>{title}</h1>
     <p class="meta">
