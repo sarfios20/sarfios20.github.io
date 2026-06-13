@@ -63,9 +63,9 @@
   --container-wide: 64rem;   /* 1024px for non-prose pages */
 
   /* Fonts */
-  --font-serif: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
-  --font-sans:  'Karla', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono:  'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-serif: 'Fraunces Variable', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-sans:  'Karla Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:  'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Effects */
   --radius-sm: 4px;
