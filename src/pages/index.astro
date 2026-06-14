@@ -3,10 +3,10 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 
-const posts = (await getCollection('blog', ({ data }) => !import.meta.env.PROD || !data.draft))
+const posts = (await getCollection('blog'))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
   .slice(0, 3);
-const projects = (await getCollection('projects', ({ data }) => data.featured && (!import.meta.env.PROD || !data.draft)))
+const projects = (await getCollection('projects', ({ data }) => data.featured))
   .sort((a, b) => (b.data.year ?? 0) - (a.data.year ?? 0));
 const allBlog = await getCollection('blog');
 function postHref(id: string | undefined): string | null {

@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 
-const projects = (await getCollection('projects', ({ data }) => !import.meta.env.PROD || !data.draft))
+const projects = (await getCollection('projects'))
   .sort((a, b) => {
     if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
     return (b.data.year ?? 0) - (a.data.year ?? 0);

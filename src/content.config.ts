@@ -10,7 +10,6 @@ const blog = defineCollection({
     updated: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),
     canonicalUrl: z.string().url().optional(),
-    draft: z.boolean().default(false),
   }),
 });
 
@@ -26,7 +25,6 @@ const projects = defineCollection({
     featured: z.boolean().default(false),
     /** Id (slug) of a related blog post, e.g. "how-i-cleaned-a-notebook-mess". */
     relatedPost: z.string().optional(),
-    draft: z.boolean().default(false),
   }),
 });
 

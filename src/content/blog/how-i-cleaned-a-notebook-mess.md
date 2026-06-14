@@ -3,7 +3,6 @@ title: "How I cleaned a 120-notebook mess"
 description: "From 120+ Jupyter notebooks and `sys.path` hacks to an installable package with snapshot tests, and the unexpected payoff for AI coding."
 date: 2026-06-11
 tags: ["python", "jupyter", "data-engineering", "refactoring"]
-draft: false
 ---
 
 I was brought in to a repo built by data analysts with varying degrees of programming knowledge (I found the mismatch jarring: the same person could understand complex SQL queries on the fly and struggle with basic Python). 120+ Jupyter notebooks plus a dozen non-packaged .py files imported with `sys.path` hacks that broke with any change. Symptom-driven development: multiple `drop_duplicates` in succession, silent error coercion, datatypes cast back and forth, and no separation between input, output, cleanup and business logic.

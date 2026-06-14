@@ -6,7 +6,6 @@ tags: ["git", "powershell", "bash", "python", "tooling"]
 year: 2026
 featured: true
 relatedPost: how-i-cleaned-a-notebook-mess
-draft: false
 ---
 
 PowerShell + bash scripts that turn six manual setup steps (worktree, hooks, venv, deps, etc.) into a single command. Used daily on a real data engineering codebase with AI agents working in parallel worktrees.
