@@ -1,0 +1,30 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  /** Resolved href of the related blog post, or null if it doesn't exist. */
+  postHref?: string | null;
+}
+
+const { project, postHref = null } = Astro.props;
+const { name, description, repo, url, tags, year, featured } = project.data;
+---
+
+<li>
+  <h2>
+    {repo ? <a href={repo}>{name}</a> : name}
+    {featured && <span class="badge"> ★</span>}
+  </h2>
+  <p>{description}</p>
+  <p class="meta muted">
+    {repo && <a href={repo}>Repo</a>}
+    {repo && url && ' · '}
+    {url && <a href={url}>Demo</a>}
+    {(repo || url) && postHref && ' · '}
+    {postHref && <a href={postHref}>Read the post</a>}
+    {(repo || url || postHref) && year && ' · '}
+    {year && <span>{year}</span>}
+    {tags.length > 0 && <> · {tags.map((tag) => `#${tag}`).join(' ')}</>}
+  </p>
+</li>

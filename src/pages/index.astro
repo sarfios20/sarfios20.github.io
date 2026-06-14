@@ -1,12 +1,18 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
 
 const posts = (await getCollection('blog', ({ data }) => !import.meta.env.PROD || !data.draft))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
   .slice(0, 3);
 const projects = (await getCollection('projects', ({ data }) => data.featured && (!import.meta.env.PROD || !data.draft)))
   .sort((a, b) => (b.data.year ?? 0) - (a.data.year ?? 0));
+const allBlog = await getCollection('blog');
+function postHref(id: string | undefined): string | null {
+  if (!id) return null;
+  return allBlog.some((p) => p.id === id) ? `/posts/${id}/` : null;
+}
 const dateFmt = new Intl.DateTimeFormat('en', { dateStyle: 'long' });
 ---
 
@@ -33,17 +39,7 @@ const dateFmt = new Intl.DateTimeFormat('en', { dateStyle: 'long' });
       <p class="muted">Nothing here yet.</p>
     ) : (
       <ul class="projects">
-        {projects.map((project) => (
-          <li>
-            <h3>{project.data.repo ? <a href={project.data.repo}>{project.data.name}</a> : project.data.name}</h3>
-            <p>{project.data.description}</p>
-            <p class="meta muted">
-              {project.data.repo && <a href={project.data.repo}>Repo</a>}
-              {project.data.repo && project.data.year && ' · '}
-              {project.data.year && <span>{project.data.year}</span>}
-            </p>
-          </li>
-        ))}
+        {projects.map((project) => <ProjectCard project={project} postHref={postHref(project.data.relatedPost)} />)}
       </ul>
     )}
     <p class="section-more"><a href="/projects/">All projects</a></p>

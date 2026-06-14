@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
 
 const projects = (await getCollection('projects', ({ data }) => !import.meta.env.PROD || !data.draft))
   .sort((a, b) => {
@@ -22,25 +23,9 @@ function postHref(id: string | undefined): string | null {
     <p class="muted">Nothing here yet.</p>
   ) : (
     <ul class="projects">
-      {projects.map((project) => {
-        const href = postHref(project.data.relatedPost);
-        return (
-          <li>
-            <h2>{project.data.repo ? <a href={project.data.repo}>{project.data.name}</a> : project.data.name}{project.data.featured && <span class="badge"> ★</span>}</h2>
-            <p>{project.data.description}</p>
-            <p class="meta muted">
-              {project.data.repo && <a href={project.data.repo}>Repo</a>}
-              {project.data.repo && project.data.url && ' · '}
-              {project.data.url && <a href={project.data.url}>Demo</a>}
-              {(project.data.repo || project.data.url) && href && ' · '}
-              {href && <a href={href}>Read the post</a>}
-              {(project.data.repo || project.data.url || href) && project.data.year && ' · '}
-              {project.data.year && <span>{project.data.year}</span>}
-              {project.data.tags.length > 0 && <> · {project.data.tags.map((tag) => `#${tag}`).join(' ')}</>}
-            </p>
-          </li>
-        );
-      })}
+      {projects.map((project) => (
+        <ProjectCard project={project} postHref={postHref(project.data.relatedPost)} />
+      ))}
     </ul>
   )}
 </BaseLayout>
