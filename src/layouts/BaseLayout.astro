@@ -187,6 +187,15 @@ const pickerConfig = {
     <link rel="sitemap" href="/sitemap-index.xml" />
     <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
     {articleLd && <script type="application/ld+json" set:html={JSON.stringify(articleLd)} />}
+
+    <!-- Analytics (GoatCounter, sin cookies) — solo en producción -->
+    {import.meta.env.PROD && (
+      <script
+        data-goatcounter="https://dhpf.goatcounter.com/count"
+        async
+        src="//gc.zgo.at/count.js"
+      />
+    )}
   </head>
   <body>
     <header class="site">
