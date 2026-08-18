@@ -5,7 +5,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <BaseLayout title="CV" description="CV of David Häggström Pérez-Flecha">
   <header class="page-intro">
     <h1>CV</h1>
-    <p>Data Engineering & Automation · Python & SQL · Software Developer</p>
+    <p>Software Engineer · Python · SQL · Linux · data pipelines, reconciliation &amp; back-office automation</p>
   </header>
 
   <div class="cta-row">
@@ -16,11 +16,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <section>
       <h2>Profile</h2>
       <p>
-        Data Analyst with hands-on experience in Python, SQL, automation, and
-        ETL pipelines. Built internal tools and data workflows in billing and
-        finance environments, with a background in software development and an
-        increasing focus on Data Engineering, especially reliable pipelines,
-        workflow automation, and data-intensive systems.
+        I lead the Python/SQL codebase a fibre operator's billing-and-collections
+        team runs daily: reporting, payment reconciliation, and the tests that keep
+        it safe to change. Outside work I build across the stack on Linux, from a
+        distributed grid simulator in Go to a production Telegram bot on PostgreSQL.
       </p>
     </section>
 
@@ -29,41 +28,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
       <div class="cv-role">
         <div class="cv-role-head">
-          <h3>Data Analyst</h3>
+          <h3>Data Analyst (backend, data &amp; automation)</h3>
           <span class="cv-role-meta">Avatel Telecom · Full-time</span>
         </div>
-        <p class="cv-role-loc">Oct 2025 – Present · Alcobendas, Madrid, Spain</p>
+        <p class="cv-role-loc">Apr 2025 – Present · Alcobendas, Madrid, Spain</p>
         <ul>
-          <li>Designed and maintained Python-based ETL pipelines over Oracle databases, integrating billing, debt, and customer lifecycle data across multiple legacy systems.</li>
-          <li>Built automated workflows replacing manual processes, improving reliability, traceability, and reducing processing times.</li>
-          <li>Developed a departmental data mart based on a star schema, providing end-to-end invoice lifecycle visibility and enabling KPI tracking and data-driven decision-making.</li>
-          <li>Translated business requirements into technical solutions, collaborating closely with operations teams.</li>
+          <li>Built and run the bank-payment reconciliation service: it identifies the payer from free-text bank descriptions using document and invoice extraction plus fuzzy matching, and matches ~4,200 payments a month to their open invoice at 98.5% precision, with measured recall and an audit trail. Also reconciles the direct-debit batches, flagging what went uncollected.</li>
+          <li>Lead the Python/SQL codebase the billing-and-collections team runs daily as its top contributor with 2,000+ commits: refactored 120+ inherited analyst notebooks into an installable package of ~13k lines, with the read layer separated from business logic, SQL externalised and Ruff plus pre-commit hooks on every change.</li>
+          <li>Took the reporting pipeline from no tests to 48 test modules: a record/replay module that replays a real run with no database or file server, an in-house snapshot-testing library, and validation gates that fail the run on any anomaly, with no warning level.</li>
+          <li>Built and own the datamart and ETL over hundreds of thousands of monthly invoices that feeds the team's reporting, and the integration layer that unifies data access and customer identity across two billing platforms, which kept reporting and automations running through a platform migration and the onboarding of acquired operators.</li>
+          <li>Cut the reporting pipeline runtime by 3.6x and RAM usage by 70% with SQL rewrites, vectorised pandas and Parquet with predicate pushdown. Built the content-addressable store that holds the billing history, with the persistent store separated from the working area and atomic writes.</li>
         </ul>
       </div>
 
       <div class="cv-role">
         <div class="cv-role-head">
-          <h3>Technical Analyst</h3>
-          <span class="cv-role-meta">Avatel Telecom · Internship</span>
-        </div>
-        <p class="cv-role-loc">Apr 2025 – Sept 2025 · Alcobendas, Madrid, Spain</p>
-        <ul>
-          <li>Built data analysis and visualization solutions for the Billing, Debts, and Collections department.</li>
-          <li>Built SQL- and Python-based solutions for operational reporting.</li>
-          <li>Created automated reporting tools for billing reconciliation with external partners.</li>
-        </ul>
-      </div>
-
-      <div class="cv-role">
-        <div class="cv-role-head">
-          <h3>Logistics & Billing Technician</h3>
+          <h3>Operations &amp; Internal Software</h3>
           <span class="cv-role-meta">PENTEX SL · Freelance</span>
         </div>
-        <p class="cv-role-loc">May 2023 – Apr 2025 · Colmenar Viejo, Madrid, Spain</p>
+        <p class="cv-role-loc">May 2023 – Mar 2025 · ~2 years · Colmenar Viejo, Madrid, Spain</p>
         <ul>
-          <li>Built a custom shipping management application to streamline logistics operations.</li>
-          <li>Managed invoicing, bank reconciliations, and operational reporting.</li>
-          <li>Drove digitalization and process automation initiatives to improve efficiency.</li>
+          <li>Built <code>pack-print</code>, a React tool that generates labels and delivery notes, replacing a manual spreadsheet process at a B2B distributor of power relays to Spain's national grid operator. Also automated their invoicing, payments and order fulfilment.</li>
         </ul>
       </div>
 
@@ -72,10 +57,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <h3>Data Visualization Intern</h3>
           <span class="cv-role-meta">inBiot Monitoring · Internship</span>
         </div>
-        <p class="cv-role-loc">Apr 2022 – Jul 2022 · Remote</p>
+        <p class="cv-role-loc">Apr 2022 – Jul 2022 · 4 months · Remote</p>
         <ul>
-          <li>Developed Grafana dashboards for visualizing IoT air quality sensor data.</li>
-          <li>Integrated data from REST APIs and managed cloud infrastructure on AWS.</li>
+          <li>Set up the AWS infrastructure (EC2, S3) serving Grafana dashboards over IoT air-quality sensor data from REST APIs.</li>
         </ul>
       </div>
     </section>
@@ -85,31 +69,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div class="cv-role">
         <div class="cv-role-head">
           <h3>Bachelor's Degree in Computer Science</h3>
-          <span class="cv-role-meta">Universidad Europea · 2023</span>
+          <span class="cv-role-meta">Universidad Europea · Graduated 2023</span>
         </div>
         <p class="cv-role-loc">
-          Software development, programming best practices, algorithms and data
-          structures, networking, security, Unix, databases, cloud fundamentals,
-          web and app development, software design, and user experience.
+          Software development, algorithms and data structures, databases,
+          networking, Unix and cloud fundamentals.
         </p>
       </div>
     </section>
 
     <section>
       <h2>Technical Skills</h2>
-      <ul class="cv-skills">
-        <li>SQL</li>
-        <li>Python</li>
-        <li>ETL / Data Pipelines</li>
-        <li>Process Automation</li>
-        <li>AWS</li>
-        <li>REST APIs</li>
-        <li>Git</li>
-        <li>Linux</li>
-        <li>Docker</li>
-        <li>JavaScript</li>
-        <li>React</li>
-        <li>HTML / CSS</li>
+      <ul class="cv-skill-rows">
+        <li><strong>Languages:</strong> Python · SQL · Bash · Go · TypeScript · C · C++ · Elixir</li>
+        <li><strong>Databases:</strong> Oracle · PostgreSQL · query tuning and execution plans</li>
+        <li><strong>Backend:</strong> REST APIs · FastAPI · Node.js · service design · integrations · billing &amp; payments</li>
+        <li><strong>Data &amp; pipelines:</strong> ETL · datamarts · pandas · Parquet · content-addressable storage · data extraction &amp; classification</li>
+        <li><strong>Platform &amp; infra:</strong> Linux · Docker · Terraform · message queues (Redis, SQS) · AWS (EC2, S3)</li>
+        <li><strong>Practices:</strong> testing (snapshot, record/replay, unit) · Git (worktrees, pre-commit) · packaging (pyproject, uv) · ruff · AI coding agents</li>
       </ul>
     </section>
 
@@ -117,7 +94,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <h2>Languages</h2>
       <ul class="cv-skills">
         <li>Spanish · Native</li>
-        <li>English · Professional</li>
+        <li>English · Fluent</li>
         <li>Swedish · Conversational</li>
       </ul>
     </section>
