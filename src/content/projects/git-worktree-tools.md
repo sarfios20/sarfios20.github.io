@@ -4,7 +4,6 @@ description: Scripts to set up git worktrees with their own Python venvs in a si
 repo: https://github.com/sarfios20/git-worktree-tools
 tags: ["git", "powershell", "bash", "python", "tooling"]
 year: 2026
-featured: true
 relatedPost: how-i-cleaned-a-notebook-mess
 ---
 
